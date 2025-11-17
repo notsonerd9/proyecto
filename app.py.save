@@ -1,0 +1,88 @@
+from flask import Flask, render_template, request
+from auditor.fetcher import fetch_site
+from auditor.analyzer import analyze_headers  # y analyze_html si la tienes
+
+app = Flask(__name__)
+
+@app.route("/analizar", methods=["GET", "POST"])
+def index():
+    if request.method == "POST":
+        url = request.form.get("url")
+        html, headers = fetch_site(url)
+        if html is None:
+            issues = ["No se pudo acceder a la URL."]
+        else:
+            issues = []
+            # Si tienes analyze_html, úsalo aquí:
+            # issues += analyze_html(html)
+            issues += analyze_headers(headers)
+
+        return render_template("report.html", url=url, issues=issues)
+    return render_template("index.html")
+
+if __name__ == "__main__":
+    app.run(debug=True)
+from flask import Flask, render_template, request
+import re
+import requests
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')
+
+@app.route('/analizar', methods=['POST'])
+def analizar():
+    url = request.form['url']
+    resultado = analizar_url(url)
+    return render_template('index.html', resultado=resultado)
+
+def analizar_url(url):
+    # Normalizar URL
+    url = url.strip()
+
+    # 1️⃣ Verificar formato válido
+    regex = re.compile(
+        r'^(?:http|ftp)s?://' # http:// o https://
+        r'(?:[\w-]+\.)+[a-z]{2,6}' # dominio
+        r'(?:[/?#]\S*)?$', re.IGNORECASE)
+    if not re.match(regex, url):
+        return "❌ La URL no tiene un formato válido."
+
+    # 2️⃣ Comprobar si responde
+    try:
+        response = requests.get(url, timeout=5)
+        status = response.status_code
+    except Exception:
+        return "⚠️ No se ha podido acceder a la URL."
+
+    # 3️⃣ Heurísticas simples de phishing / legitimidad
+    indicadores_sospechosos = [
+        "login", "verify", "update", "secure", "account", "bank", "free", "gift", "win"
+    ]
+    puntuacion = 0
+
+    # Subdominios excesivos → sospechoso
+    if url.count('.') > 3:
+        puntuacion += 1
+
+    # Palabras sospechosas
+    for palabra in indicadores_sospechosos:
+        if palabra in url.lower():
+            puntuacion += 1
+
+    # Si contiene dirección IP → sospechoso
+    if re.match(r"http[s]?://\d+\.\d+\.\d+\.\d+", url):
+        puntuacion += 2
+
+    # Resultado
+    if puntuacion == 0 and status == 200:
+        return "✅ La URL parece legítima."
+    elif puntuacion < 3:
+        return "⚠️ La URL podría ser sospechosa. Revisa con precaución."
+    else:
+        return "🚨 La URL parece fraudulenta o peligrosa."
+
+if __name__ == '__main__':
+    app.run(debug=True)

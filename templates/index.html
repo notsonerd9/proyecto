@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoría de Seguridad Web</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7fafa; }
+        .main-container {
+            /* El contenedor principal usa flex-col y min-h-screen para asegurar el footer al final */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body class="main-container">
+
+    <!-- Contenedor de formularios que crece y se centra -->
+    <div class="w-full max-w-4xl mx-auto space-y-12 flex-grow">
+
+        <!-- AUDITORÍA DE SEGURIDAD PROFUNDA (Ruta: /auditar) -->
+        <div class="bg-white shadow-xl rounded-xl p-8 border-t-4 border-sky-500">
+            <div class="text-center mb-6">
+                <i class="fas fa-shield-alt text-sky-500 text-4xl"></i>
+                <h1 class="text-3xl font-extrabold text-gray-900 mt-3">Auditoría de Seguridad para Sitios Web</h1>
+                <p class="text-gray-600">Detecta vulnerabilidades en encabezados, configuración y código completo.</p>
+            </div>
+            
+            <form action="/auditar" method="POST" class="space-y-4">
+                <label for="url_auditoria" class="block text-sm font-medium text-gray-700">Introduce la URL del sitio a auditar:</label>
+                <input 
+                    type="text" 
+                    id="url_auditoria" 
+                    name="url_auditoria" 
+                    placeholder="https://ejemplo.com" 
+                    required 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500 shadow-sm"
+                >
+                
+                <label for="tipo_auditoria" class="block text-sm font-medium text-gray-700">Tipo de Auditoría:</label>
+                <select id="tipo_auditoria" name="tipo_auditoria" class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-sky-500 focus:border-sky-500">
+                    <option value="simple">Simple (Encabezados y Código)</option>
+                    <option value="completa">Completa (Simulación de Herramientas + NMAP)</option>
+                </select>
+
+                <button 
+                    type="submit" 
+                    class="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg shadow-md transition duration-150"
+                >
+                    <i class="fas fa-search-plus mr-2"></i> Auditar Sitio Web
+                </button>
+            </form>
+        </div>
+
+        <!-- ANALIZADOR DE PHISHING Y MALWARE (Ruta: /analizar) -->
+        <div class="bg-white shadow-xl rounded-xl p-8 border-t-4 border-amber-500">
+            <div class="text-center mb-6">
+                <i class="fas fa-puzzle-piece text-amber-500 text-4xl"></i>
+                <h1 class="text-3xl font-extrabold text-gray-900 mt-3">Analizador de URL Sospechosa</h1>
+                <p class="text-gray-600">Comprueba rápidamente si una URL es sospechosa de Phishing o Malware.</p>
+            </div>
+            
+            <form action="/analizar" method="POST" class="space-y-4">
+                <label for="url_analizar" class="block text-sm font-medium text-gray-700">Introduce la URL del sitio a inspeccionar:</label>
+                <input 
+                    type="text" 
+                    id="url_analizar" 
+                    name="url_analizar" 
+                    placeholder="https://ejemplo-phishing.com" 
+                    required 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500 shadow-sm"
+                >
+                <button 
+                    type="submit" 
+                    class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg shadow-md transition duration-150"
+                >
+                    <i class="fas fa-eye mr-2"></i> Inspeccionar URL
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- FOOTER: Posicionado correctamente al final del contenido -->
+    <footer class="w-full text-center text-sm text-gray-500 py-4 mt-8">
+        &copy; 2025 Auditoría Web Low-Code | Proyecto de Fin de Grado
+    </footer>
+
+</body>
+</html>

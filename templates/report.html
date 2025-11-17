@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe de Resultados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7fafa; padding: 2rem; }
+        .container { max-width: 900px; margin: auto; }
+        
+        .status-peligro { background-color: #fef2f2; border-left: 4px solid #ef4444; } 
+        .status-con-riesgos { background-color: #fffbeb; border-left: 4px solid #f59e0b; } 
+        .status-sospechosa { background-color: #fffbeb; border-left: 4px solid #f59e0b; } 
+        .status-legitima, .status-seguro-aparentemente { background-color: #ecfdf5; border-left: 4px solid #10b981; } 
+        .status-error { background-color: #eff6ff; border-left: 4px solid #3b82f6; } 
+        
+        .issue-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .issue-icon-container {
+            flex-shrink: 0;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .issue-text {
+            flex-grow: 1;
+            font-size: 0.95rem;
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container bg-white shadow-2xl rounded-xl p-6 md:p-10">
+        
+        <header class="flex justify-between items-center mb-8 border-b pb-4">
+            <h1 class="text-3xl font-extrabold text-gray-900">Informe de Resultados</h1>
+            <div class="space-x-4">
+                <button onclick="window.print()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150">
+                    <i class="fas fa-file-pdf mr-2"></i> Exportar a PDF
+                </button>
+                <a href="/" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150">
+                    <i class="fas fa-arrow-left mr-2"></i> Volver
+                </a>
+            </div>
+        </header>
+
+        <!-- Banner de Resultado Final -->
+        {% set status_text_normalized = resultados.general_status.lower().replace(' ', '-').replace('(', '').replace(')', '') %}
+        {% set status_class = 'status-' + status_text_normalized %}
+        {% set status_icon = 'fas fa-shield-alt' %}
+        {% set status_color = 'text-green-600' %}
+
+        {% if 'peligro' in status_text_normalized or 'con-riesgos' in status_text_normalized %}
+            {% set status_icon = 'fas fa-exclamation-triangle' %}
+            {% set status_color = 'text-red-600' %}
+        {% elif 'sospechosa' in status_text_normalized %}
+            {% set status_icon = 'fas fa-exclamation-circle' %}
+            {% set status_color = 'text-amber-600' %}
+        {% elif 'error' in status_text_normalized %}
+            {% set status_icon = 'fas fa-times-circle' %}
+            {% set status_color = 'text-blue-600' %}
+        {% endif %}
+
+        <div class="{{ status_class }} p-5 rounded-lg mb-8 shadow-sm">
+            <h2 class="text-xl font-bold flex items-center mb-2">
+                Resultado Final: <span class="{{ status_color }} ml-2"><i class="{{ status_icon }} mr-2"></i> {{ resultados.general_status }}</span>
+            </h2>
+            <p class="text-gray-700"><strong>URL Analizada:</strong> {{ resultados.url_analizada }}</p>
+            {% if 'tipo_auditoria' in resultados %}
+                <p class="text-gray-700"><strong>Tipo de Análisis:</strong> 
+                    {% if resultados.tipo_auditoria == 'phishing' %}
+                        Analizador de Phishing
+                    {% elif resultados.tipo_auditoria == 'simple' %}
+                        Auditoría Simple (Encabezados y Código)
+                    {% elif resultados.tipo_auditoria == 'completa' %}
+                        Auditoría Completa (Simulación de Herramientas)
+                    {% else %}
+                        Desconocido
+                    {% endif %}
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Observaciones Detalladas -->
+        <h3 class="text-xl font-bold text-gray-800 mb-4">
+            Observaciones Detalladas ({{ resultados.issues|length }}):
+        </h3>
+
+        <div class="border border-gray-200 rounded-lg divide-y divide-gray-200">
+            
+            {% for issue in resultados.issues %}
+                
+                {% set issue_text = issue.strip() %}
+                
+                {% if issue_text.startswith('---') %}
+                    <!-- Manejar encabezados de sección fuera del bloque principal de elementos -->
+                    <div class="p-4 bg-gray-50 font-semibold text-gray-700 text-sm italic">{{ issue }}</div>
+                {% else %}
+                    <!-- Bloque principal de elementos de la lista -->
+                    
+                    {% set icon_class = 'fa-info-circle text-blue-500' %}
+                    
+                    {% if issue_text.startswith('🚨') or issue_text.startswith('❌') %}
+                        {% set icon_class = 'fa-skull-crossbones text-red-600' %}
+                        {% set issue_text = issue_text[1:].strip() %}
+                    {% elif issue_text.startswith('⚠️') %}
+                        {% set icon_class = 'fa-exclamation-triangle text-amber-500' %}
+                        {% set issue_text = issue_text[1:].strip() %}
+                    {% elif issue_text.startswith('✅') %}
+                        {% set icon_class = 'fa-check-circle text-green-500' %}
+                        {% set issue_text = issue_text[1:].strip() %}
+                    {% else %}
+                        {% set icon_class = 'fa-info-circle text-blue-500' %}
+                    {% endif %}
+                    
+                    <div class="issue-item bg-white hover:bg-gray-50">
+                        <div class="issue-icon-container">
+                            <i class="fas {{ icon_class }}"></i>
+                        </div>
+                        <div class="issue-text">
+                            {{ issue_text }}
+                        </div>
+                    </div>
+                {% endif %}
+
+            {% endfor %}
+            
+
+            {% if not resultados.issues %}
+                <div class="p-5 text-gray-500 text-center">No se encontraron observaciones detalladas.</div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</body>
+</html>
