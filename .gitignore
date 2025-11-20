@@ -9,3 +9,10 @@ __pycache__/
 
 # Archivos de sistema/SO
 .DS_Store
+
+# Dependencias de Node
+node_modules/
+package-lock.json
+
+# Binario de Tailwind CLI
+tailwind

@@ -1,0 +1,27 @@
+{
+  "name": "websec-auditor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "init-tailwind": "./node_modules/.bin/tailwindcss init -p",
+    "build-css": "./node_modules/.bin/tailwindcss -i ./input.css -o ./static/style.css --minify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/notsonerd9/proyecto.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/notsonerd9/proyecto/issues"
+  },
+  "homepage": "https://github.com/notsonerd9/proyecto#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.17"
+  }
+}
